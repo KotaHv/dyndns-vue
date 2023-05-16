@@ -1,5 +1,7 @@
 FROM node:18-bullseye as build
 
+ENV VITE_BASE_API=/api
+
 WORKDIR /dyndns-vue
 
 COPY package.json yarn.lock ./
