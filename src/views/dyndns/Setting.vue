@@ -79,7 +79,7 @@ const newDynDNS: DynDNS = reactive({
     username: "",
     password: "",
     hostname: "",
-    ip: 0,
+    ip: 3,
     interface: "",
     sleep_interval: 10
 });
@@ -114,6 +114,9 @@ function init() {
 onMounted(async () => {
     init();
     interfaces.value = await interfacesApi.get();
+    if (!newDynDNS.interface) {
+        newDynDNS.interface = interfaces.value[0];
+    }
 })
 
 async function update() {
