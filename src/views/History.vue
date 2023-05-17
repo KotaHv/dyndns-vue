@@ -7,7 +7,7 @@
             <v-divider />
             <v-card-text class="table-container">
                 <v-data-table-server :headers="headers" :items="histories" :loading="loading" :items-length="total"
-                    item-value="new_ip" @update:options="getHistory" density="compact">
+                    item-value="new_ip" @update:options="getHistory" multi-sort density="compact">
                 </v-data-table-server>
             </v-card-text>
         </v-card>

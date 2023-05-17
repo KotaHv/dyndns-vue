@@ -18,8 +18,7 @@ export async function get(
     per_page: perPage.toString(),
   });
   if (sortBy.length) {
-    params.append("sortby", sortBy[0].key);
-    params.append("order", sortBy[0].order);
+    params.append("sort_items", JSON.stringify(sortBy));
   }
   const res: HistoryRes = await request
     .get(URL, {
