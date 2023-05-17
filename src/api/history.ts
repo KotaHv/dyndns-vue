@@ -2,18 +2,28 @@ import request from "@/utils/request";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { HistoryRes, HistoryIpVersion, History } from "@/types/dyndns";
+import { SortItem } from "@/types/vuetify";
 
 dayjs.extend(utc);
 
 const URL = "history";
 
-export async function get(page: number, perPage: number): Promise<HistoryRes> {
+export async function get(
+  page: number,
+  perPage: number,
+  sortBy: SortItem[]
+): Promise<HistoryRes> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    per_page: perPage.toString(),
+  });
+  if (sortBy.length) {
+    params.append("sortby", sortBy[0].key);
+    params.append("order", sortBy[0].order);
+  }
   const res: HistoryRes = await request
     .get(URL, {
-      searchParams: new URLSearchParams({
-        page: page.toString(),
-        per_page: perPage.toString(),
-      }),
+      searchParams: params,
     })
     .json();
   for (const h of res.histories) {

@@ -17,6 +17,7 @@
 <script setup lang="ts">
 import * as history from "@/api/history";
 import { History } from '@/types/dyndns';
+import { SortItem } from '@/types/vuetify';
 import { ref } from "vue";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 
@@ -27,14 +28,16 @@ const headers = [
     { title: "updated", key: "updated" },
 ];
 
+
 const loading = ref(true);
 const total = ref(0);
 
 const histories = ref<History[]>([]);
 
-async function getHistory({ page, itemsPerPage }: { page: number, itemsPerPage: number }) {
+
+async function getHistory({ page, itemsPerPage, sortBy }: { page: number, itemsPerPage: number, sortBy: SortItem[] }) {
     loading.value = true;
-    const result = await history.get(page, itemsPerPage);
+    const result = await history.get(page, itemsPerPage, sortBy);
 
     histories.value = result.histories;
     total.value = result.total;
