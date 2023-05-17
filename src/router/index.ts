@@ -13,9 +13,8 @@ const routes = [
     children: [
       {
         path: "",
-        name: "Home",
         redirect: () => {
-          return { name: "History" };
+          return { name: "Dyndns" };
         },
       },
       {
