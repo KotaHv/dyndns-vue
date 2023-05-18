@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - v*
+env:
+  VITE_BASE_API: "/api"
 
 jobs:
   build-release:

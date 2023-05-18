@@ -6,13 +6,11 @@ on:
 
 env:
   IMAGE_NAME: dyndns-vue
-  CARGO_NET_GIT_FETCH_WITH_CLI: true
+  VITE_BASE_API: "/api"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      VITE_BASE_API: "/api"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
