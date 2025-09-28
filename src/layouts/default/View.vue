@@ -1,6 +1,8 @@
 <template>
-  <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-    <router-view />
+  <main class="max-w-7xl mx-auto">
+    <section class="px-4 sm:px-6 lg:px-8 py-6">
+      <router-view />
+    </section>
   </main>
 </template>
 

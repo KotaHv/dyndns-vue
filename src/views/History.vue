@@ -1,11 +1,90 @@
 <template>
   <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-      <h1>IP History</h1>
-      <div class="flex space-x-2">
+    <div class="px-4 sm:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <h1 class="text-lg font-semibold text-gray-900">IP History</h1>
+      <div class="flex items-center space-x-2">
+        <div class="relative md:hidden" ref="mobileSortContainerRef">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center p-2 rounded-md transition-colors"
+            :class="
+              hasActiveSort
+                ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+            "
+            @click.stop="toggleMobileSortPanel"
+            ref="mobileSortButtonRef"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M7 12h10M10 18h4"
+              />
+            </svg>
+          </button>
+
+          <transition name="fade">
+            <div
+              v-if="mobileSortOpen"
+              class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-30 p-3 space-y-3"
+              ref="mobileSortPanelRef"
+            >
+              <div class="space-y-2 max-h-64 overflow-y-auto">
+                <div
+                  v-for="option in sortOptions"
+                  :key="option.key"
+                  class="border border-gray-200 rounded-md px-3 py-2 space-y-2"
+                >
+                  <div class="flex items-center justify-between">
+                    <label class="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        :checked="isMobileSortSelected(option.key)"
+                        @change.stop="toggleMobileSortOption(option.key)"
+                      />
+                      <span class="text-sm text-gray-700">{{ option.label }}</span>
+                    </label>
+                    <span v-if="isMobileSortSelected(option.key)" class="text-xs text-gray-500">
+                      #{{ getMobileSortPosition(option.key) }}
+                    </span>
+                  </div>
+                  <div v-if="isMobileSortSelected(option.key)" class="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      class="px-2 py-1 text-xs font-medium rounded border"
+                      :class="
+                        getMobileSortOrder(option.key) === 'asc'
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-600 border-gray-300'
+                      "
+                      @click.stop="setMobileSortOrder(option.key, 'asc')"
+                    >
+                      Ascending
+                    </button>
+                    <button
+                      type="button"
+                      class="px-2 py-1 text-xs font-medium rounded border"
+                      :class="
+                        getMobileSortOrder(option.key) === 'desc'
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-600 border-gray-300'
+                      "
+                      @click.stop="setMobileSortOrder(option.key, 'desc')"
+                    >
+                      Descending
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
         <button
           @click="multi"
-          class="p-2 rounded transition-colors"
+          class="hidden md:inline-flex p-2 rounded transition-colors"
           :class="
             multiSort
               ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
@@ -38,109 +117,181 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="min-w-full">
-        <thead>
-          <tr class="border-b border-gray-200 bg-gray-50">
-            <th
-              @click="sortBy('old_ip')"
-              class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
-              :class="getSortHeaderClass('old_ip')"
-            >
-              <div class="flex items-center space-x-1">
-                <span>Old IP</span>
-                <span class="ml-1 text-xs">{{ getSortIndicator('old_ip') }}</span>
-              </div>
-            </th>
+    <div class="px-4 sm:px-6 py-6">
+      <div class="hidden md:block overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50">
+              <th
+                @click="sortBy('old_ip')"
+                class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
+                :class="getSortHeaderClass('old_ip')"
+              >
+                <div class="flex items-center space-x-1">
+                  <span>Old IP</span>
+                  <span class="ml-1 text-xs">{{ getSortIndicator('old_ip') }}</span>
+                </div>
+              </th>
 
-            <th
-              @click="sortBy('new_ip')"
-              class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
-              :class="getSortHeaderClass('new_ip')"
-            >
-              <div class="flex items-center space-x-1">
-                <span>New IP</span>
-                <span class="ml-1 text-xs">{{ getSortIndicator('new_ip') }}</span>
-              </div>
-            </th>
+              <th
+                @click="sortBy('new_ip')"
+                class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
+                :class="getSortHeaderClass('new_ip')"
+              >
+                <div class="flex items-center space-x-1">
+                  <span>New IP</span>
+                  <span class="ml-1 text-xs">{{ getSortIndicator('new_ip') }}</span>
+                </div>
+              </th>
 
-            <th
-              @click="sortBy('version')"
-              class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
-              :class="getSortHeaderClass('version')"
-            >
-              <div class="flex items-center space-x-1">
-                <span>Version</span>
-                <span class="ml-1 text-xs">{{ getSortIndicator('version') }}</span>
-              </div>
-            </th>
+              <th
+                @click="sortBy('version')"
+                class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
+                :class="getSortHeaderClass('version')"
+              >
+                <div class="flex items-center space-x-1">
+                  <span>Version</span>
+                  <span class="ml-1 text-xs">{{ getSortIndicator('version') }}</span>
+                </div>
+              </th>
 
-            <th
-              @click="sortBy('updated')"
-              class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
-              :class="getSortHeaderClass('updated')"
-            >
-              <div class="flex items-center space-x-1">
-                <span>Updated</span>
-                <span class="ml-1 text-xs">{{ getSortIndicator('updated') }}</span>
-              </div>
-            </th>
-          </tr>
-        </thead>
+              <th
+                @click="sortBy('updated')"
+                class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
+                :class="getSortHeaderClass('updated')"
+              >
+                <div class="flex items-center space-x-1">
+                  <span>Updated</span>
+                  <span class="ml-1 text-xs">{{ getSortIndicator('updated') }}</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
 
-        <tbody class="bg-white">
-          <tr v-if="loading">
-            <td colspan="4" class="py-12 px-4 text-center text-gray-500">
-              <div class="flex justify-center">
-                <svg
-                  class="animate-spin h-6 w-6 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+          <tbody class="bg-white">
+            <tr v-if="loading">
+              <td colspan="4" class="py-12 px-4 text-center text-gray-500">
+                <div class="flex justify-center">
+                  <svg
+                    class="animate-spin h-6 w-6 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </div>
+              </td>
+            </tr>
+
+            <tr v-else-if="histories.length === 0">
+              <td colspan="4" class="py-12 px-4 text-center text-gray-500">
+                No history records found
+              </td>
+            </tr>
+
+            <tr
+              v-else
+              v-for="item in histories"
+              :key="item.new_ip"
+              class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.old_ip || '-'">
+                <div class="whitespace-pre-line break-all">
+                  {{ (item.old_ip || '-').replace(/,/g, '\n') }}
+                </div>
+              </td>
+
+              <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.new_ip">
+                <div class="whitespace-pre-line break-all">
+                  {{ item.new_ip.replace(/,/g, '\n') }}
+                </div>
+              </td>
+
+              <td class="py-4 px-4 text-sm text-gray-900">
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  :class="
+                    item.version === 'V4'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-green-100 text-green-800'
+                  "
                 >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              </div>
-            </td>
-          </tr>
+                  {{ item.version }}
+                </span>
+              </td>
 
-          <tr v-else-if="histories.length === 0">
-            <td colspan="4" class="py-12 px-4 text-center text-gray-500">
-              No history records found
-            </td>
-          </tr>
+              <td class="py-4 px-4 text-sm text-gray-500" :title="item.updated">
+                {{ item.updated }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-          <tr
-            v-else
+      <div class="md:hidden">
+        <div v-if="loading" class="py-12 text-center text-gray-500">
+          <div class="flex justify-center">
+            <svg
+              class="animate-spin h-6 w-6 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </div>
+        </div>
+
+        <div v-else-if="histories.length === 0" class="py-12 text-center text-gray-500">
+          No history records found
+        </div>
+
+        <div v-else class="space-y-4">
+          <div
             v-for="item in histories"
-            :key="item.new_ip"
-            class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            :key="`${item.new_ip}-${item.updated}`"
+            class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-3"
           >
-            <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.old_ip || '-'">
-              <div class="whitespace-pre-line break-all">
+            <div>
+              <p class="text-xs uppercase text-gray-500">Old IP</p>
+              <p class="mt-1 font-mono text-sm text-gray-900 whitespace-pre-line break-all">
                 {{ (item.old_ip || '-').replace(/,/g, '\n') }}
-              </div>
-            </td>
+              </p>
+            </div>
 
-            <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.new_ip">
-              <div class="whitespace-pre-line break-all">
+            <div>
+              <p class="text-xs uppercase text-gray-500">New IP</p>
+              <p class="mt-1 font-mono text-sm text-gray-900 whitespace-pre-line break-all">
                 {{ item.new_ip.replace(/,/g, '\n') }}
-              </div>
-            </td>
+              </p>
+            </div>
 
-            <td class="py-4 px-4 text-sm text-gray-900">
+            <div class="flex items-center justify-between">
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 :class="
@@ -151,18 +302,18 @@
               >
                 {{ item.version }}
               </span>
-            </td>
-
-            <td class="py-4 px-4 text-sm text-gray-500" :title="item.updated">
-              {{ item.updated }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <p class="text-sm text-gray-500" :title="item.updated">{{ item.updated }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Pagination -->
-    <div v-if="!loading && total > 0" class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+    <div
+      v-if="!loading && total > 0"
+      class="px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50 mt-4 sm:mt-6"
+    >
       <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
         <div class="text-sm text-gray-700">
           Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
@@ -227,7 +378,7 @@
 import * as history from '@/api/history'
 import type { History } from '@/types/dyndns'
 import type { SortItem } from '@/types/vuetify'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 
 const sortItems = ref<SortItem[]>([])
 const loading = ref(true)
@@ -236,6 +387,22 @@ const histories = ref<History[]>([])
 const multiSort = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
+
+const sortOptions = [
+  { key: 'old_ip', label: 'Old IP' },
+  { key: 'new_ip', label: 'New IP' },
+  { key: 'version', label: 'Version' },
+  { key: 'updated', label: 'Updated' },
+]
+
+const mobileSortOpen = ref(false)
+const mobileSortOrder = ref<string[]>([])
+const mobileSortDirections = ref<Record<string, 'asc' | 'desc'>>({})
+const mobileSortButtonRef = ref<HTMLElement | null>(null)
+const mobileSortPanelRef = ref<HTMLElement | null>(null)
+const mobileSortContainerRef = ref<HTMLElement | null>(null)
+
+const hasActiveSort = computed(() => sortItems.value.length > 0)
 
 const totalPages = computed(() => Math.ceil(total.value / itemsPerPage.value))
 
@@ -257,6 +424,62 @@ function multi() {
   if (!multiSort.value && sortItems.value.length > 1) {
     sortItems.value = sortItems.value.slice(0, 1)
     loadHistory()
+  }
+}
+
+const isMobileSortSelected = (key: string) => mobileSortOrder.value.includes(key)
+
+const getMobileSortOrder = (key: string) => mobileSortDirections.value[key] ?? 'asc'
+
+const getMobileSortPosition = (key: string) => mobileSortOrder.value.indexOf(key) + 1
+
+function applyMobileSort() {
+  sortItems.value = mobileSortOrder.value.map((key) => ({
+    key,
+    order: mobileSortDirections.value[key] ?? 'asc',
+  }))
+  multiSort.value = sortItems.value.length > 1
+  loadHistory()
+}
+
+function toggleMobileSortOption(key: string) {
+  if (isMobileSortSelected(key)) {
+    mobileSortOrder.value = mobileSortOrder.value.filter((item) => item !== key)
+    const updatedDirections = { ...mobileSortDirections.value }
+    delete updatedDirections[key]
+    mobileSortDirections.value = updatedDirections
+  } else {
+    mobileSortOrder.value = [...mobileSortOrder.value, key]
+    mobileSortDirections.value = { ...mobileSortDirections.value, [key]: 'asc' }
+  }
+
+  applyMobileSort()
+}
+
+function setMobileSortOrder(key: string, order: 'asc' | 'desc') {
+  if (!isMobileSortSelected(key)) return
+  if (getMobileSortOrder(key) === order) return
+
+  mobileSortDirections.value = { ...mobileSortDirections.value, [key]: order }
+  applyMobileSort()
+}
+
+function toggleMobileSortPanel() {
+  mobileSortOpen.value = !mobileSortOpen.value
+}
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (!mobileSortOpen.value) return
+
+  const targets = [
+    mobileSortButtonRef.value,
+    mobileSortPanelRef.value,
+    mobileSortContainerRef.value,
+  ].filter((el): el is HTMLElement => Boolean(el))
+
+  const clickedInside = targets.some((el) => el.contains(event.target as Node))
+  if (!clickedInside) {
+    mobileSortOpen.value = false
   }
 }
 
@@ -340,5 +563,22 @@ async function loadHistory() {
 
 onMounted(() => {
   loadHistory()
+  document.addEventListener('click', handleClickOutside)
 })
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
+watch(
+  sortItems,
+  (items) => {
+    mobileSortOrder.value = items.map((item) => item.key)
+    mobileSortDirections.value = items.reduce<Record<string, 'asc' | 'desc'>>((acc, item) => {
+      acc[item.key] = item.order
+      return acc
+    }, {})
+  },
+  { deep: true, immediate: true },
+)
 </script>

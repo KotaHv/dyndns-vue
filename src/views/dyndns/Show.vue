@@ -14,7 +14,7 @@
                 <p
                   v-for="(ip, index) in splitIps(v4.old)"
                   :key="`v4-old-${index}`"
-                  class="whitespace-nowrap overflow-x-auto"
+                  class="break-all sm:break-normal sm:whitespace-nowrap sm:overflow-x-auto"
                 >
                   {{ ip }}
                 </p>
@@ -29,7 +29,7 @@
                 <p
                   v-for="(ip, index) in splitIps(v4.current)"
                   :key="`v4-current-${index}`"
-                  class="whitespace-nowrap overflow-x-auto"
+                  class="break-all sm:break-normal sm:whitespace-nowrap sm:overflow-x-auto"
                 >
                   {{ ip }}
                 </p>
@@ -59,7 +59,7 @@
                 <p
                   v-for="(ip, index) in splitIps(v6.old)"
                   :key="`v6-old-${index}`"
-                  class="whitespace-nowrap overflow-x-auto"
+                  class="break-all sm:break-normal sm:whitespace-nowrap sm:overflow-x-auto"
                 >
                   {{ ip }}
                 </p>
@@ -74,7 +74,7 @@
                 <p
                   v-for="(ip, index) in splitIps(v6.current)"
                   :key="`v6-current-${index}`"
-                  class="whitespace-nowrap overflow-x-auto"
+                  class="break-all sm:break-normal sm:whitespace-nowrap sm:overflow-x-auto"
                 >
                   {{ ip }}
                 </p>
@@ -99,33 +99,33 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label class="block mb-1">Server</label>
-            <p>{{ dynDNS.server }}</p>
+            <p class="break-words break-all sm:break-normal">{{ dynDNS.server }}</p>
           </div>
           <div>
             <label class="block mb-1">Username</label>
-            <p>{{ dynDNS.username }}</p>
+            <p class="break-words break-all sm:break-normal">{{ dynDNS.username }}</p>
           </div>
           <div>
             <label class="block mb-1">Password</label>
-            <p>{{ dynDNS.password }}</p>
+            <p class="break-words break-all sm:break-normal">{{ dynDNS.password }}</p>
           </div>
           <div>
             <label class="block mb-1">Hostname</label>
-            <p>{{ dynDNS.hostname }}</p>
+            <p class="break-words break-all sm:break-normal">{{ dynDNS.hostname }}</p>
           </div>
           <div>
             <label class="block mb-1">IP Version</label>
-            <p>{{ ip }}</p>
+            <p class="break-words break-all sm:break-normal">{{ ip }}</p>
           </div>
           <div>
             <label class="block mb-1">Interface</label>
-            <p>{{ dynDNS.interface }}</p>
+            <p class="break-words break-all sm:break-normal">{{ dynDNS.interface }}</p>
           </div>
           <div>
             <label class="block mb-1"
               >Sleep Interval (secs)</label
             >
-            <p>{{ dynDNS.sleep_interval }}</p>
+            <p class="break-words break-all sm:break-normal">{{ dynDNS.sleep_interval }}</p>
           </div>
         </div>
       </div>
