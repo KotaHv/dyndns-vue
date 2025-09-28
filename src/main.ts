@@ -7,13 +7,13 @@ import App from './App.vue'
 import router from './router'
 import { useDynDNS } from '@/stores/dyndns'
 
-const pinia = createPinia()
 const app = createApp(App)
-;(async () => {
-  app.use(pinia)
-  const store = useDynDNS()
-  await store.getDynDNS()
+const pinia = createPinia()
+app.use(pinia)
 
-  app.use(router)
-  app.mount('#app')
-})()
+const store = useDynDNS()
+await store.getDynDNS()
+
+app.use(router)
+
+app.mount('#app')
