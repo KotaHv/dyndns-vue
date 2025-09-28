@@ -1,29 +1,19 @@
-/**
- * main.ts
- *
- * Bootstraps Vuetify and other plugins then mounts the App`
- */
+import './assets/main.css'
 
-// Components
-import App from "./App.vue";
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 
-// Composables
-import { createApp } from "vue";
-import { createPinia } from "pinia";
+import App from './App.vue'
+import router from './router'
+import { useDynDNS } from '@/stores/dyndns'
 
-// Plugins
-import { registerPlugins } from "@/plugins";
+const pinia = createPinia()
+const app = createApp(App)
+;(async () => {
+  app.use(pinia)
+  const store = useDynDNS()
+  await store.getDynDNS()
 
-import { useDynDNS } from "@/stores/dyndns";
-
-const pinia = createPinia();
-const app = createApp(App);
-
-app.use(pinia);
-
-(async () => {
-  const store = useDynDNS();
-  await store.getDynDNS();
-  registerPlugins(app);
-  app.mount("#app");
-})();
+  app.use(router)
+  app.mount('#app')
+})()

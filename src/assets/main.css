@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+@layer base {
+  :root {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+  }
+
+  body {
+    @apply text-base leading-relaxed text-gray-900 bg-gray-50;
+  }
+
+  h1 {
+    @apply text-2xl font-semibold text-gray-800;
+  }
+
+  h2 {
+    @apply text-xl font-semibold text-gray-800;
+  }
+
+  h3 {
+    @apply text-lg font-semibold text-gray-800;
+  }
+
+  p {
+    @apply text-base text-gray-900;
+  }
+
+  label {
+    @apply text-base font-semibold text-gray-700;
+  }
+}

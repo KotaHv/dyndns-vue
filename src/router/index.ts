@@ -1,59 +1,56 @@
 // Composables
-import {
-  createRouter,
-  createWebHistory,
-  createWebHashHistory,
-} from "vue-router";
-import { useDynDNS } from "@/stores/dyndns";
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
+import { useDynDNS } from '@/stores/dyndns'
 
 const routes = [
   {
-    path: "/",
-    component: () => import("@/layouts/default/Default.vue"),
+    path: '/',
+    component: () => import('@/layouts/default/Default.vue'),
     children: [
       {
-        path: "",
+        path: '',
         redirect: () => {
-          return { name: "Dyndns" };
+          return { name: 'Dyndns' }
         },
       },
       {
-        path: "dyndns",
-        name: "Dyndns",
-        component: () => import("@/views/dyndns/Show.vue"),
+        path: 'dyndns',
+        name: 'Dyndns',
+        component: () => import('@/views/dyndns/Show.vue'),
       },
       {
-        path: "dyndns/setting",
-        name: "DyndnsSetting",
-        component: () => import("@/views/dyndns/Setting.vue"),
+        path: 'dyndns/setting',
+        name: 'DyndnsSetting',
+        component: () => import('@/views/dyndns/Setting.vue'),
       },
       {
-        path: "history",
-        name: "History",
-        component: () => import("@/views/History.vue"),
+        path: 'history',
+        name: 'History',
+        component: () => import('@/views/History.vue'),
       },
     ],
   },
-];
+]
 
-let history;
+let history
 
 if (import.meta.env.DEV) {
-  history = createWebHistory(process.env.BASE_URL);
+  history = createWebHistory(import.meta.env.BASE_URL)
 } else {
-  history = createWebHashHistory();
+  history = createWebHashHistory()
 }
 
 const router = createRouter({
   history,
   routes,
-});
+})
 
 router.beforeEach(async (to) => {
-  const store = useDynDNS();
-  if (!store.created && to.name !== "DyndnsSetting") {
-    return { name: "DyndnsSetting" };
-  }
-});
+  const store = useDynDNS()
 
-export default router;
+  if (!store.created && to.name !== 'DyndnsSetting') {
+    return { name: 'DyndnsSetting' }
+  }
+})
+
+export default router

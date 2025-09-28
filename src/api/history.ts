@@ -1,48 +1,43 @@
-import request from "@/utils/request";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import { HistoryRes, HistoryIpVersion, History } from "@/types/dyndns";
-import { SortItem } from "@/types/vuetify";
+import request from '@/utils/request'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import type { HistoryRes, History } from '@/types/dyndns'
+import { HistoryIpVersion } from '@/types/dyndns'
+import type { SortItem } from '@/types/vuetify'
 
-dayjs.extend(utc);
+dayjs.extend(utc)
 
-const URL = "history";
+const URL = 'history'
 
-export async function get(
-  page: number,
-  perPage: number,
-  sortBy: SortItem[]
-): Promise<HistoryRes> {
+export async function get(page: number, perPage: number, sortBy: SortItem[]): Promise<HistoryRes> {
   const params = new URLSearchParams({
     page: page.toString(),
     per_page: perPage.toString(),
-  });
+  })
   if (sortBy.length) {
-    params.append("sort_items", JSON.stringify(sortBy));
+    params.append('sort_items', JSON.stringify(sortBy))
   }
   const res: HistoryRes = await request
     .get(URL, {
       searchParams: params,
     })
-    .json();
+    .json()
   for (const h of res.histories) {
-    h.updated = dayjs.utc(h.updated).local().format();
+    h.updated = dayjs.utc(h.updated).local().format()
   }
-  return res;
+  return res
 }
 
-export async function current(
-  version: HistoryIpVersion
-): Promise<History | null> {
+export async function current(version: HistoryIpVersion): Promise<History | null> {
   const res: History | null = await request
-    .get(URL + "/current", {
+    .get(URL + '/current', {
       searchParams: new URLSearchParams({
         version,
       }),
     })
-    .json();
+    .json()
   if (res != null) {
-    res.updated = dayjs.utc(res.updated).local().format();
+    res.updated = dayjs.utc(res.updated).local().format()
   }
-  return res;
+  return res
 }

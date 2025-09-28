@@ -1,5 +1,5 @@
-import ky from "ky";
-import { useError } from "@/stores/error";
+import ky from 'ky'
+import { useError } from '@/stores/error'
 
 const service = ky.extend({
   prefixUrl: import.meta.env.VITE_BASE_API,
@@ -8,19 +8,19 @@ const service = ky.extend({
     afterResponse: [
       (req, op, res) => {
         if (res.status == 404) {
-          return new Response(null, { status: 200 });
+          return new Response(null, { status: 200 })
         }
-        return res;
+        return res
       },
     ],
     beforeError: [
       async (err) => {
-        const store = useError();
-        const reason = (await err.response.json()).error;
-        store.setError(reason);
-        return err;
+        const store = useError()
+        const response = (await err.response.json()) as { error: string }
+        store.setError(response.error)
+        return err
       },
     ],
   },
-});
-export default service;
+})
+export default service
