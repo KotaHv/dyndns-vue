@@ -122,10 +122,8 @@
             <p class="break-words break-all sm:break-normal">{{ dynDNS.interface }}</p>
           </div>
           <div>
-            <label class="block mb-1"
-              >Sleep Interval (secs)</label
-            >
-            <p class="break-words break-all sm:break-normal">{{ dynDNS.sleep_interval }}</p>
+            <label class="block mb-1">Sleep Interval (secs)</label>
+            <p class="break-words break-all sm:break-normal">{{ dynDNS.sleepInterval }}</p>
           </div>
         </div>
       </div>
@@ -146,7 +144,7 @@ import { onMounted, computed, reactive } from 'vue'
 import { useDynDNS } from '@/stores/dyndns'
 import { storeToRefs } from 'pinia'
 import * as api from '@/api/history'
-import { HistoryIpVersion } from '@/types/dyndns'
+import { HistoryIpVersion } from '@/types/history'
 
 const settingRouter = { name: 'DyndnsSetting' }
 const store = useDynDNS()
@@ -184,8 +182,8 @@ onMounted(async () => {
   if (dynDNS.value.ip == 1 || dynDNS.value.ip == 3) {
     const res = await api.current(HistoryIpVersion.V4)
     if (res != null) {
-      v4.old = res.old_ip || ''
-      v4.current = res.new_ip
+      v4.old = res.oldIp || ''
+      v4.current = res.newIp
       v4.updated = res.updated
       v4.show = true
     }
@@ -193,8 +191,8 @@ onMounted(async () => {
   if (dynDNS.value.ip == 2 || dynDNS.value.ip == 3) {
     const res = await api.current(HistoryIpVersion.V6)
     if (res != null) {
-      v6.old = res.old_ip || ''
-      v6.current = res.new_ip
+      v6.old = res.oldIp || ''
+      v6.current = res.newIp
       v6.updated = res.updated
       v6.show = true
     }

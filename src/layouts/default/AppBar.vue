@@ -13,6 +13,14 @@
             {{ link.name }}
           </router-link>
         </div>
+        <div class="flex items-center" v-if="auth.isAuthenticated">
+          <button
+            @click="logout"
+            class="px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-white hover:bg-red-500 transition-colors"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   </nav>
@@ -20,6 +28,16 @@
 
 <script lang="ts" setup>
 import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/stores/auth'
 
 const links = reactive([{ name: 'Dyndns' }, { name: 'History' }])
+
+const auth = useAuth()
+const router = useRouter()
+
+const logout = () => {
+  auth.logout()
+  router.push({ name: 'Login' })
+}
 </script>

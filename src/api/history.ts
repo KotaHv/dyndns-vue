@@ -1,9 +1,8 @@
 import request from '@/utils/request'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import type { HistoryRes, History } from '@/types/dyndns'
-import { HistoryIpVersion } from '@/types/dyndns'
-import type { SortItem } from '@/types/vuetify'
+import type { HistoryRes, History, SortItem } from '@/types/history'
+import { HistoryIpVersion } from '@/types/history'
 
 dayjs.extend(utc)
 

@@ -123,24 +123,24 @@
           <thead>
             <tr class="border-b border-gray-200 bg-gray-50">
               <th
-                @click="sortBy('old_ip')"
+                @click="sortBy('oldIp')"
                 class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
-                :class="getSortHeaderClass('old_ip')"
+                :class="getSortHeaderClass('oldIp')"
               >
                 <div class="flex items-center space-x-1">
                   <span>Old IP</span>
-                  <span class="ml-1 text-xs">{{ getSortIndicator('old_ip') }}</span>
+                  <span class="ml-1 text-xs">{{ getSortIndicator('oldIp') }}</span>
                 </div>
               </th>
 
               <th
-                @click="sortBy('new_ip')"
+                @click="sortBy('newIp')"
                 class="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors"
-                :class="getSortHeaderClass('new_ip')"
+                :class="getSortHeaderClass('newIp')"
               >
                 <div class="flex items-center space-x-1">
                   <span>New IP</span>
-                  <span class="ml-1 text-xs">{{ getSortIndicator('new_ip') }}</span>
+                  <span class="ml-1 text-xs">{{ getSortIndicator('newIp') }}</span>
                 </div>
               </th>
 
@@ -205,18 +205,18 @@
             <tr
               v-else
               v-for="item in histories"
-              :key="item.new_ip"
+              :key="item.newIp"
               class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
             >
-              <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.old_ip || '-'">
+              <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.oldIp || '-'">
                 <div class="whitespace-pre-line break-all">
-                  {{ (item.old_ip || '-').replace(/,/g, '\n') }}
+                  {{ (item.oldIp || '-').replace(/,/g, '\n') }}
                 </div>
               </td>
 
-              <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.new_ip">
+              <td class="py-4 px-4 text-sm text-gray-900 font-mono" :title="item.newIp">
                 <div class="whitespace-pre-line break-all">
-                  {{ item.new_ip.replace(/,/g, '\n') }}
+                  {{ item.newIp.replace(/,/g, '\n') }}
                 </div>
               </td>
 
@@ -274,20 +274,20 @@
         <div v-else class="space-y-4">
           <div
             v-for="item in histories"
-            :key="`${item.new_ip}-${item.updated}`"
+            :key="`${item.newIp}-${item.updated}`"
             class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-3"
           >
             <div>
               <p class="text-xs uppercase text-gray-500">Old IP</p>
               <p class="mt-1 font-mono text-sm text-gray-900 whitespace-pre-line break-all">
-                {{ (item.old_ip || '-').replace(/,/g, '\n') }}
+                {{ (item.oldIp || '-').replace(/,/g, '\n') }}
               </p>
             </div>
 
             <div>
               <p class="text-xs uppercase text-gray-500">New IP</p>
               <p class="mt-1 font-mono text-sm text-gray-900 whitespace-pre-line break-all">
-                {{ item.new_ip.replace(/,/g, '\n') }}
+                {{ item.newIp.replace(/,/g, '\n') }}
               </p>
             </div>
 
@@ -376,8 +376,7 @@
 
 <script setup lang="ts">
 import * as history from '@/api/history'
-import type { History } from '@/types/dyndns'
-import type { SortItem } from '@/types/vuetify'
+import type { History, SortItem } from '@/types/history'
 import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 
 const sortItems = ref<SortItem[]>([])
@@ -389,8 +388,8 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
 const sortOptions = [
-  { key: 'old_ip', label: 'Old IP' },
-  { key: 'new_ip', label: 'New IP' },
+  { key: 'oldIp', label: 'Old IP' },
+  { key: 'newIp', label: 'New IP' },
   { key: 'version', label: 'Version' },
   { key: 'updated', label: 'Updated' },
 ]

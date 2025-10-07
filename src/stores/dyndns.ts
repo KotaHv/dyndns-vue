@@ -17,7 +17,7 @@ export const useDynDNS = defineStore('dyndns', {
         hostname: '',
         ip: 1,
         interface: '',
-        sleep_interval: 10,
+        sleepInterval: 10,
       },
       status: false,
     }

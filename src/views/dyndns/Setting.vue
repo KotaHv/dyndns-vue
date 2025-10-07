@@ -111,11 +111,9 @@
 
           <!-- Sleep Interval -->
           <div>
-            <label class="block mb-2"
-              >Sleep Interval (secs)</label
-            >
+            <label class="block mb-2">Sleep Interval (secs)</label>
             <input
-              v-model.number="newDynDNS.sleep_interval"
+              v-model.number="newDynDNS.sleepInterval"
               type="number"
               placeholder="10"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -162,7 +160,7 @@ const newDynDNS: DynDNS = reactive({
   hostname: '',
   ip: 3,
   interface: '',
-  sleep_interval: 10,
+  sleepInterval: 10,
 })
 
 const re_scheme = /https?:\/\//
@@ -205,7 +203,7 @@ const interfaceError = computed(() => {
 })
 
 const sleepIntervalError = computed(() => {
-  if (newDynDNS.sleep_interval <= 0) return 'The value must be greater than 0'
+  if (newDynDNS.sleepInterval <= 0) return 'The value must be greater than 0'
   return ''
 })
 
@@ -227,7 +225,7 @@ function init() {
   newDynDNS.hostname = dynDNS.value.hostname
   newDynDNS.ip = dynDNS.value.ip
   newDynDNS.interface = dynDNS.value.interface
-  newDynDNS.sleep_interval = dynDNS.value.sleep_interval
+  newDynDNS.sleepInterval = dynDNS.value.sleepInterval
 }
 
 onMounted(async () => {
