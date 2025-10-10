@@ -36,8 +36,8 @@ const links = reactive([{ name: 'Dyndns' }, { name: 'History' }])
 const auth = useAuth()
 const router = useRouter()
 
-const logout = () => {
-  auth.logout()
-  router.push({ name: 'Login' })
+const logout = async () => {
+  await auth.logout().catch(() => {})
+  await router.push({ name: 'Login' }).catch(() => {})
 }
 </script>

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useDynDNS } from '@/stores/dyndns'
-import { login as loginRequest } from '@/api/auth'
-import type { Auth, AuthToken } from '@/types/auth'
+import { login as loginRequest, refresh as refreshRequest, logout as logoutRequest } from '@/api/auth'
+import type { Auth, AuthToken, RefreshRequest } from '@/types/auth'
 
 const TOKEN_STORAGE_KEY = 'dyndns_token'
 
@@ -27,14 +27,23 @@ function saveToken(data: AuthToken | null) {
 
 const initialToken = loadToken()
 
+let refreshPromise: Promise<AuthToken> | null = null
+
+function buildRefreshPayload(refreshToken: string): RefreshRequest {
+  return { refreshToken }
+}
+
 export const useAuth = defineStore('auth', {
   state: () => ({
     token: initialToken?.token ?? '',
     tokenType: initialToken?.tokenType ?? 'Bearer',
     expiresAt: initialToken?.expiresAt ?? '',
+    refreshToken: initialToken?.refreshToken ?? '',
+    refreshExpiresAt: initialToken?.refreshExpiresAt ?? '',
   }),
   getters: {
     isAuthenticated: (state) => Boolean(state.token),
+    canRefresh: (state) => Boolean(state.refreshToken),
   },
   actions: {
     setAuth(data: AuthToken | null) {
@@ -42,10 +51,14 @@ export const useAuth = defineStore('auth', {
         this.token = data.token
         this.tokenType = data.tokenType
         this.expiresAt = data.expiresAt
+        this.refreshToken = data.refreshToken
+        this.refreshExpiresAt = data.refreshExpiresAt
       } else {
         this.token = ''
         this.tokenType = 'Bearer'
         this.expiresAt = ''
+        this.refreshToken = ''
+        this.refreshExpiresAt = ''
       }
       saveToken(data)
     },
@@ -55,13 +68,57 @@ export const useAuth = defineStore('auth', {
         token: response.token,
         tokenType: response.tokenType || 'Bearer',
         expiresAt: response.expiresAt,
+        refreshToken: response.refreshToken,
+        refreshExpiresAt: response.refreshExpiresAt,
       })
       return response
     },
-    logout() {
+    async refresh() {
+      if (!this.refreshToken) {
+        throw new Error('Missing refresh token')
+      }
+
+      if (!refreshPromise) {
+        const payload = buildRefreshPayload(this.refreshToken)
+        const tokenUsed = this.refreshToken
+        refreshPromise = refreshRequest(payload)
+          .then((response) => {
+            if (this.refreshToken !== tokenUsed) {
+              return response
+            }
+
+            this.setAuth({
+              token: response.token,
+              tokenType: response.tokenType || 'Bearer',
+              expiresAt: response.expiresAt,
+              refreshToken: response.refreshToken,
+              refreshExpiresAt: response.refreshExpiresAt,
+            })
+            return response
+          })
+          .finally(() => {
+            refreshPromise = null
+          })
+      }
+
+      return refreshPromise
+    },
+    async logout(options: { revoke?: boolean } = { revoke: true }) {
+      const { revoke } = options
+      const refreshToken = this.refreshToken
+
       this.setAuth(null)
+      refreshPromise = null
       const dyndns = useDynDNS()
       dyndns.$reset()
+
+      if (revoke && refreshToken) {
+        try {
+          await logoutRequest(buildRefreshPayload(refreshToken))
+        } catch {
+          // ignore logout revocation failures
+        }
+      }
     },
   },
 })
