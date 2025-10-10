@@ -22,11 +22,49 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
-      - name: Build extensions
+      - name: Build dyndns-vue
         run: pnpm build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
       - name: Zip dyndns-vue
         run: zip -qq -r ./dyndns-vue.zip ./dist
       - name: Upload Github Assets
         uses: softprops/action-gh-release@v2
         with:
           files: ./dyndns-vue.zip
+  build-docker-image:
+    needs: build-release
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: dyndns-vue
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate App Version
+        run: echo VERSIONED_TAG="$(git describe --tags --always)" >> $GITHUB_ENV
+      - name: Set lower case owner name
+        run: echo "OWNER_LC=${OWNER,,}" >> $GITHUB_ENV
+        env:
+          OWNER: ${{ github.repository_owner }}
+      - name: Build and release Docker images
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_LC }}/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ env.OWNER_LC }}/${{ env.IMAGE_NAME }}:${{ env.VERSIONED_TAG }}
